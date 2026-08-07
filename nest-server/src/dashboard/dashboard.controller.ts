@@ -1,35 +1,28 @@
-import { Controller, Get, Req } from '@nestjs/common';
+import { Controller, Get, Req, UnauthorizedException } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import type { Request } from 'express';
-import { BaseUserDTO } from 'src/auth/dto/auth.dto';
-import { all_users } from 'src/auth/service/auth/auth.service';
-import { Role, Roles } from 'src/common/custom-decorators/roles';
-import { EncryptedUser } from 'src/common/types/types';
+import { UserResponseDTO } from '../auth/dto/auth.dto';
+import { AuthService } from '../auth/service/auth/auth.service';
+import { Role, Roles } from '../common/custom-decorators/roles';
+import { EncryptedUser } from '../common/types/types';
+
 
 @Controller('dashboard')
 export class DashboardController {
-  /**
-   * @Endpoint : signin.
-   * @description : login for user.
-   * @params {payload: SignInDTO}.
-   * @RequestMethod :  POST.
-   * @return : token or error.
-   */
+  constructor(private readonly authService: AuthService) {}
+
   @ApiOperation({ summary: 'This endpoint is for getting user details' })
   @Get('getUserDetails')
-  getUserDetails(@Req() req: Request): BaseUserDTO[] {
+  getUserDetails(@Req() req: Request): UserResponseDTO[] {
     if (!req['user']) {
-      throw new Error('User not authenticated');
+      throw new UnauthorizedException('User not authenticated');
     }
     const user: EncryptedUser = req['user'] as EncryptedUser;
-    if (user.role !== Role.Admin) {
-      return all_users.size ? [...all_users.values()] : [];
+    if (user.role === Role.Admin) {
+      return this.authService.getAllUsers();
     }
-    return [
-      all_users.has(user.email)
-        ? all_users.get(user.email)!
-        : ({} as BaseUserDTO),
-    ];
+    const singleUser = this.authService.getUserByEmail(user.email);
+    return singleUser ? [singleUser] : [];
   }
 
   @Roles(Role.Admin)
@@ -43,3 +36,4 @@ export class DashboardController {
     };
   }
 }
+

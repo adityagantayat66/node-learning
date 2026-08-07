@@ -1,10 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsEmail,
+  IsInt,
   IsNotEmpty,
-  IsNumberString,
+  Min,
   MinLength,
 } from 'class-validator';
+import { Role } from '../../common/custom-decorators/roles';
 
 export class SignInDTO {
   @ApiProperty({ example: 'adi@mail.com' })
@@ -16,8 +19,9 @@ export class SignInDTO {
   @MinLength(6)
   password: string;
 }
+
 export class SignUpDTO {
-  @ApiProperty()
+  @ApiProperty({ example: 'Aditya' })
   @IsNotEmpty()
   fullName: string;
 
@@ -25,16 +29,37 @@ export class SignUpDTO {
   @MinLength(6)
   password: string;
 
-  @ApiProperty()
-  @IsNumberString()
+  @ApiProperty({ example: 25 })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
   age: number;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'adi@mail.com' })
   @IsEmail()
   @IsNotEmpty()
   email: string;
 }
+
 export class BaseUserDTO extends SignUpDTO {
   @ApiProperty()
   _id: string;
 }
+
+export class UserResponseDTO {
+  @ApiProperty()
+  _id: string;
+
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  fullName: string;
+
+  @ApiProperty()
+  age: number;
+
+  @ApiProperty({ enum: Role, required: false })
+  role?: Role;
+}
+

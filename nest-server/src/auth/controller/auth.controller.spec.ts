@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
+import { AuthService } from '../service/auth/auth.service';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -7,6 +8,15 @@ describe('AuthController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
+      providers: [
+        {
+          provide: AuthService,
+          useValue: {
+            signIn: jest.fn().mockResolvedValue({ token: 'mock-token', role: 'User' }),
+            signUp: jest.fn().mockResolvedValue('User Registered'),
+          },
+        },
+      ],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
@@ -16,3 +26,4 @@ describe('AuthController', () => {
     expect(controller).toBeDefined();
   });
 });
+
