@@ -2,14 +2,13 @@ import { Controller, Get, Req, UnauthorizedException } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { UserResponseDTO } from '../auth/dto/auth.dto';
-import { AuthService } from '../auth/service/auth/auth.service';
+import { DashboardService } from './service/dashboard.service';
 import { Role, Roles } from '../common/custom-decorators/roles';
 import { EncryptedUser } from '../common/types/types';
 
-
 @Controller('dashboard')
 export class DashboardController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly dashboardService: DashboardService) {}
 
   @ApiOperation({ summary: 'This endpoint is for getting user details' })
   @Get('getUserDetails')
@@ -19,9 +18,9 @@ export class DashboardController {
     }
     const user: EncryptedUser = req['user'] as EncryptedUser;
     if (user.role === Role.Admin) {
-      return this.authService.getAllUsers();
+      return this.dashboardService.getAllUsers();
     }
-    const singleUser = this.authService.getUserByEmail(user.email);
+    const singleUser = this.dashboardService.getUserByEmail(user.email);
     return singleUser ? [singleUser] : [];
   }
 
@@ -29,11 +28,7 @@ export class DashboardController {
   @ApiOperation({ summary: 'This endpoint is for checking company details' })
   @Get('companyInfo')
   getCompanyInfo() {
-    return {
-      name: 'Tech Solutions Inc.',
-      address: '1234 Innovation Drive, Tech City, TX 75001',
-      contactEmail: 'contact@techsolutions.com',
-    };
+    return this.dashboardService.getCompanyInfo();
   }
 }
 

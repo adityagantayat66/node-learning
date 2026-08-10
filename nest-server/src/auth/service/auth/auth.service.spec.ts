@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { UsersService } from '../../../users/users.service';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -30,6 +31,15 @@ describe('AuthService', () => {
               if (key === 'ADMIN_PASSWORD') return 'qwerty';
               throw new Error(`Missing key ${key}`);
             }),
+          },
+        },
+        {
+          provide: UsersService,
+          useValue: {
+            has: jest.fn().mockReturnValue(false),
+            get: jest.fn().mockReturnValue(undefined),
+            set: jest.fn(),
+            findAll: jest.fn().mockReturnValue([]),
           },
         },
       ],

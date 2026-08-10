@@ -4,24 +4,23 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import {
-  BaseUserDTO,
   SignInDTO,
   SignUpDTO,
-  UserResponseDTO,
 } from '../../dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Role } from '../../../common/custom-decorators/roles';
 
+import { UsersService } from '../../../users/users.service';
+
 @Injectable()
 export class AuthService {
-  private readonly users = new Map<string, BaseUserDTO>();
-
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
-  ) {}
+    private usersService: UsersService,
+  ) { }
 
   async signIn(payload: SignInDTO): Promise<{ token: string; role: Role }> {
     const adminEmail = this.configService.getOrThrow<string>('ADMIN_EMAIL');
@@ -36,8 +35,8 @@ export class AuthService {
     if (isAdmin) {
       isMatch =
         payload.email === adminEmail && payload.password === adminPassword;
-    } else if (this.users.has(payload.email)) {
-      const hash = this.users.get(payload.email)?.password || '';
+    } else if (this.usersService.has(payload.email)) {
+      const hash = this.usersService.get(payload.email)?.password || '';
       isMatch = await bcrypt.compare(payload.password, hash);
     }
 
@@ -54,7 +53,7 @@ export class AuthService {
   }
 
   async signUp(payload: SignUpDTO): Promise<string> {
-    if (this.users.has(payload.email)) {
+    if (this.usersService.has(payload.email)) {
       throw new UnprocessableEntityException('Email Already Registered');
     }
     const { email, fullName, age, password } = payload;
@@ -62,7 +61,7 @@ export class AuthService {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    this.users.set(email, {
+    this.usersService.set(email, {
       email,
       fullName,
       age,
@@ -71,26 +70,6 @@ export class AuthService {
     });
 
     return 'User Registered';
-  }
-
-  getAllUsers(): UserResponseDTO[] {
-    return Array.from(this.users.values()).map((user) => ({
-      _id: user._id,
-      email: user.email,
-      fullName: user.fullName,
-      age: user.age,
-    }));
-  }
-
-  getUserByEmail(email: string): UserResponseDTO | null {
-    const user = this.users.get(email);
-    if (!user) return null;
-    return {
-      _id: user._id,
-      email: user.email,
-      fullName: user.fullName,
-      age: user.age,
-    };
   }
 }
 
