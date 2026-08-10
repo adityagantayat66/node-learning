@@ -11,22 +11,31 @@ import {
 } from '../../dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { Role } from '../../../common/custom-decorators/roles';
 
 @Injectable()
 export class AuthService {
   private readonly users = new Map<string, BaseUserDTO>();
 
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private configService: ConfigService,
+  ) {}
 
   async signIn(payload: SignInDTO): Promise<{ token: string; role: Role }> {
-    const isAdmin = payload.email.includes('admin');
+    const adminEmail = this.configService.getOrThrow<string>('ADMIN_EMAIL');
+    const adminPassword =
+      this.configService.getOrThrow<string>('ADMIN_PASSWORD');
+
+    const isAdmin =
+      payload.email === adminEmail || payload.email.includes('admin');
     const role = isAdmin ? Role.Admin : Role.User;
     let isMatch = false;
 
     if (isAdmin) {
       isMatch =
-        payload.email === 'admin@mail.com' && payload.password === 'qwerty';
+        payload.email === adminEmail && payload.password === adminPassword;
     } else if (this.users.has(payload.email)) {
       const hash = this.users.get(payload.email)?.password || '';
       isMatch = await bcrypt.compare(payload.password, hash);

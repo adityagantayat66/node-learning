@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -14,6 +15,21 @@ describe('AuthService', () => {
           useValue: {
             signAsync: jest.fn().mockResolvedValue('mock-token'),
             verifyAsync: jest.fn().mockResolvedValue({ email: 'test@mail.com', role: 'User' }),
+          },
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn((key: string, defaultValue?: string) => {
+              if (key === 'ADMIN_EMAIL') return 'admin@mail.com';
+              if (key === 'ADMIN_PASSWORD') return 'qwerty';
+              return defaultValue;
+            }),
+            getOrThrow: jest.fn((key: string) => {
+              if (key === 'ADMIN_EMAIL') return 'admin@mail.com';
+              if (key === 'ADMIN_PASSWORD') return 'qwerty';
+              throw new Error(`Missing key ${key}`);
+            }),
           },
         },
       ],
