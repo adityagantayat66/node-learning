@@ -14,4 +14,5 @@ EXPOSE 3000
 CMD [ "node", "dist/main.js"]
 
 #build cmd-  docker build -t nestapi .
-#run cmd- docker run -d --name nestapi --env-file .env -p 3000:3000 nestapi   
+#network- docker network create mynet
+#run cmd- docker run -d --name nestapi --net mynet --env-file .env -p 3000:3000 nestapi   
