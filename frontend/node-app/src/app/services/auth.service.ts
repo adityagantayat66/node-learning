@@ -6,17 +6,17 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private _http: HttpClient) {}
+  constructor(private _http: HttpClient) { }
 
   register(regFormData: FormData): Observable<any> {
     return this._http.post(
-      'http://localhost:8080/api/auth/signup',
+      'http://localhost:3000/api/auth/signup',
       regFormData,
     );
   }
   login(loginFormData: FormData): Observable<any> {
     return this._http.post(
-      'http://localhost:8080/api/auth/signin',
+      'http://localhost:3000/api/auth/signin',
       loginFormData,
     );
   }

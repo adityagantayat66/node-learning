@@ -12,7 +12,7 @@ export class DashboardController {
 
   @ApiOperation({ summary: 'This endpoint is for getting user details' })
   @Get('getUserDetails')
-  getUserDetails(@Req() req: Request): UserResponseDTO[] {
+  async getUserDetails(@Req() req: Request): Promise<UserResponseDTO[]> {
     if (!req['user']) {
       throw new UnauthorizedException('User not authenticated');
     }
@@ -20,7 +20,7 @@ export class DashboardController {
     if (user.role === Role.Admin) {
       return this.dashboardService.getAllUsers();
     }
-    const singleUser = this.dashboardService.getUserByEmail(user.email);
+    const singleUser = await this.dashboardService.getUserByEmail(user.email);
     return singleUser ? [singleUser] : [];
   }
 

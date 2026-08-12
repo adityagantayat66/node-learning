@@ -50,7 +50,7 @@ export class RegisterComponent {
   constructor(
     private _authService: AuthService,
     private _router: Router,
-  ) {}
+  ) { }
   submitForm(): void {
     const regFormData = new FormData();
     if (this.registerForm.valid) {
@@ -72,10 +72,10 @@ export class RegisterComponent {
       .register(regFormData)
       .pipe(take(1))
       .subscribe((data) => {
-        if (data && data.success) {
+        if (data && data.status) {
           this._router.navigate(['login']);
         }
       });
   }
-  removeServerError(): void {}
+  removeServerError(): void { }
 }

@@ -29,17 +29,25 @@ export class AuthService {
 
     const isAdmin =
       payload.email === adminEmail || payload.email.includes('admin');
-    const role = isAdmin ? Role.Admin : Role.User;
     let isMatch = false;
+    let role: Role;
 
     if (isAdmin) {
       isMatch =
         payload.email === adminEmail && payload.password === adminPassword;
-    } else if (this.usersService.has(payload.email)) {
-      const hash = this.usersService.get(payload.email)?.password || '';
-      isMatch = await bcrypt.compare(payload.password, hash);
+      role = Role.Admin;
     }
-
+    else {
+      const fetchedUserDetails = await this.usersService.get(payload.email);
+      if (!fetchedUserDetails) {
+        throw new UnauthorizedException('Invalid Credentials');
+      }
+      else {
+        const hash = fetchedUserDetails?.password || '';
+        isMatch = await bcrypt.compare(payload.password, hash);
+        role = fetchedUserDetails?.role || Role.User;
+      }
+    }
     if (!isMatch) {
       throw new UnauthorizedException('Invalid Credentials');
     }
@@ -53,20 +61,20 @@ export class AuthService {
   }
 
   async signUp(payload: SignUpDTO): Promise<string> {
-    if (this.usersService.has(payload.email)) {
+    if (await this.usersService.has(payload.email)) {
       throw new UnprocessableEntityException('Email Already Registered');
     }
     const { email, fullName, age, password } = payload;
-    const _id = crypto.randomUUID();
+    const role = Role.User
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    this.usersService.set(email, {
+    this.usersService.set({
       email,
       fullName,
       age,
       password: hashedPassword,
-      _id,
+      role,
     });
 
     return 'User Registered';

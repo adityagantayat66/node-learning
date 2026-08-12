@@ -1,23 +1,31 @@
 import { Injectable } from '@nestjs/common';
-import { BaseUserDTO } from '../auth/dto/auth.dto';
+import { BaseUserDTO, SignUpDTO, UserToSaveDTO } from '../auth/dto/auth.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  private readonly users = new Map<string, BaseUserDTO>();
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
+  ) { }
 
-  has(email: string): boolean {
-    return this.users.has(email);
+  async has(email: string): Promise<boolean> {
+    const user = await this.userRepository.findOneBy({ email });
+    return !!user;
   }
 
-  get(email: string): BaseUserDTO | undefined {
-    return this.users.get(email);
+  async get(email: string): Promise<User | null> {
+    const user = await this.userRepository.findOneBy({ email });
+    return user;
   }
 
-  set(email: string, user: BaseUserDTO): void {
-    this.users.set(email, user);
+  async set(user: UserToSaveDTO): Promise<User> {
+    return await this.userRepository.save(user);
   }
 
-  findAll(): BaseUserDTO[] {
-    return Array.from(this.users.values());
+  async findAll(): Promise<User[]> {
+    return await this.userRepository.find();
   }
 }

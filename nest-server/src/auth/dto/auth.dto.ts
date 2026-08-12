@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
   Min,
   MinLength,
+  IsString
 } from 'class-validator';
 import { Role } from '../../common/custom-decorators/roles';
 
@@ -23,9 +24,12 @@ export class SignInDTO {
 export class SignUpDTO {
   @ApiProperty({ example: 'Aditya' })
   @IsNotEmpty()
+  @IsString()
   fullName: string;
 
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   @MinLength(6)
   password: string;
 
@@ -44,6 +48,11 @@ export class SignUpDTO {
 export class BaseUserDTO extends SignUpDTO {
   @ApiProperty()
   _id: string;
+}
+
+export class UserToSaveDTO extends SignUpDTO {
+  @ApiProperty()
+  role: Role;
 }
 
 export class UserResponseDTO {

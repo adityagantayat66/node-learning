@@ -6,9 +6,22 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './common/guards/auth.guard';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      password: 'root',
+      username: 'postgres',
+      entities: [],
+      database: 'nestapp',
+      autoLoadEntities: true,
+      synchronize: true,
+      logging: true,
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       validate: (config: Record<string, any>) => {
@@ -32,4 +45,4 @@ import { DashboardModule } from './dashboard/dashboard.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

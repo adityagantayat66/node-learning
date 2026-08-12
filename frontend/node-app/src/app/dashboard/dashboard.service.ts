@@ -6,9 +6,9 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class DashboardService {
-  constructor(private _http: HttpClient) {}
+  constructor(private _http: HttpClient) { }
 
   getDashboardData(): Observable<any> {
-    return this._http.get('http://localhost:8080/api/dashboard/getUserDetails');
+    return this._http.get('http://localhost:3000/api/dashboard/getUserDetails');
   }
 }

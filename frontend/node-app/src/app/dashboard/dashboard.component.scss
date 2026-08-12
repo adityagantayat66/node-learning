@@ -1,4 +1,4 @@
-.welcome-bar{
+.welcome-bar {
   background-color: rgb(240, 240, 240);
   width: 100%;
   font-weight: 500;
@@ -10,23 +10,28 @@
   // justify-content: center;
   gap: 2rem;
 }
-.welcome-title{
+
+.welcome-title {
   flex: 1;
 }
-.logout-btn{
+
+.logout-btn {
   margin-right: 2rem;
 }
-.username{
+
+.username {
   color: teal;
 }
-.user-card{
+
+.user-card {
   border-radius: 10px;
   background-color: rgb(240, 240, 255);
   width: 50%;
   padding: 20px;
   height: 250px;
 }
-.detail{
+
+.detail {
   display: flex;
   height: 32px;
   text-align: center;
@@ -34,30 +39,35 @@
   border: 0.25px dotted gray;
   border-radius: 10px;
 }
-.title{
+
+.title {
   background-color: gray;
   color: white;
   width: 100px;
-  padding: 10px;
+  padding: 5px;
   border-radius: 10px;
 }
-.value{
+
+.value {
   width: 120px;
-  padding: 10px;
+  padding: 5px;
   text-align: center;
   color: teal;
 }
-.container{
+
+.container {
   display: flex;
   align-items: center;
   justify-content: center;
   margin-top: 24px;
 }
-.table-data{
+
+.table-data {
   margin-top: 24px;
   border-radius: 10px;
 }
-.zero-user{
+
+.zero-user {
   padding: 30px;
   width: 100%;
   display: flex;

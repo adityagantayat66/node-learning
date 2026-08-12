@@ -4,10 +4,11 @@ import { UsersService } from '../../users/users.service';
 
 @Injectable()
 export class DashboardService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
-  getAllUsers(): UserResponseDTO[] {
-    return this.usersService.findAll().map((user) => ({
+  async getAllUsers(): Promise<UserResponseDTO[]> {
+    const all_users = await this.usersService.findAll();
+    return all_users.map((user) => ({
       _id: user._id,
       email: user.email,
       fullName: user.fullName,
@@ -15,8 +16,8 @@ export class DashboardService {
     }));
   }
 
-  getUserByEmail(email: string): UserResponseDTO | null {
-    const user = this.usersService.get(email);
+  async getUserByEmail(email: string): Promise<UserResponseDTO | null> {
+    const user = await this.usersService.get(email);
     if (!user) return null;
     return {
       _id: user._id,
