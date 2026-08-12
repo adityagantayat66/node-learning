@@ -1,5 +1,0 @@
-FROM nginx:1.30.4-alpine
-COPY nginx.conf /etc/nginx/nginx.conf
-EXPOSE 8080
-#docker build -t nginximg ./nginx
-#docker run --name nginxcont --net mynet -p 8080:8080 nginximg:latest

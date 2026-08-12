@@ -8,7 +8,7 @@ import { Role } from '../../common/custom-decorators/roles';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @ApiOperation({ summary: 'This endpoint is for signing in the user' })
   @SkipAuth()

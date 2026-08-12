@@ -1,33 +1,55 @@
 <div class="container">
   <div class="form-data">
-    <form name="loginForm" [formGroup]="loginForm" (ngSubmit)="submitForm()" novalidate>
+    <form
+      name="loginForm"
+      [formGroup]="loginForm"
+      (ngSubmit)="submitForm()"
+      novalidate
+    >
       <div *ngIf="serverError" class="message-box error mb-16">
-              {{ serverError }}
+        {{ serverError }}
       </div>
 
       <div class="form-fields">
-      <mat-form-field appearance="outline">
-          <input matInput placeholder="Enter your Email" formControlName="email" (focus)="removeServerError()">
+        <mat-form-field appearance="outline">
+          <input
+            matInput
+            placeholder="Enter your Email"
+            formControlName="email"
+            (focus)="removeServerError()"
+          />
           <mat-icon matSuffix>mail</mat-icon>
           <mat-error *ngIf="loginForm.get('email')?.invalid">
-                 email is required
+            email is required
           </mat-error>
-      </mat-form-field>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline">
-          <input matInput  placeholder="Enter your Password" type="password" formControlName="password">
+        <mat-form-field appearance="outline">
+          <input
+            matInput
+            placeholder="Enter your Password"
+            type="password"
+            formControlName="password"
+          />
           <mat-icon matSuffix>vpn_key</mat-icon>
-          <mat-error *ngIf="loginForm.get('password')?.invalid ">
-              Enter Your Password
+          <mat-error *ngIf="loginForm.get('password')?.invalid">
+            Enter Your Password
           </mat-error>
-      </mat-form-field>
-    </div>
+        </mat-form-field>
+      </div>
 
-      <button mat-raised-button class="submit-button" aria-label="LOGIN"
-          [disabled]="loginForm.invalid">
-          LOGIN
+      <button
+        mat-raised-button
+        class="submit-button"
+        aria-label="LOGIN"
+        [disabled]="loginForm.invalid"
+      >
+        LOGIN
       </button>
-
-  </form>  </div>
-
+    </form>
+    <span
+      >Don't have an account?
+      <span class="redirect-link" routerLink="/register">Register</span></span
+    >
+  </div>
 </div>

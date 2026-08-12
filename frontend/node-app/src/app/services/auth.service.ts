@@ -6,28 +6,25 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class AuthService {
+  constructor(private _http: HttpClient) {}
 
-  constructor(private _http: HttpClient) { }
-
-  register(regFormData: FormData): Observable<any>
-  {
-    return this._http.post('http://localhost:5000/api/register', regFormData);
+  register(regFormData: FormData): Observable<any> {
+    return this._http.post(
+      'http://localhost:8080/api/auth/signup',
+      regFormData,
+    );
   }
-  login(loginFormData: FormData): Observable<any>
-  {
-    return this._http.post('http://localhost:5000/api/login', loginFormData);
+  login(loginFormData: FormData): Observable<any> {
+    return this._http.post(
+      'http://localhost:8080/api/auth/signin',
+      loginFormData,
+    );
   }
-  testMiddleware(): Observable<any>
-  {
-    return this._http.get('http://localhost:5000/api/test');
-  }
-  storeToken(data: any): void
-  {
+  storeToken(data: any): void {
     localStorage.setItem('access_id', data.token);
-    localStorage.setItem('role', data.role)
+    localStorage.setItem('role', data.role === 'user' ? '0' : '1');
   }
-  logout(): void
-  {
+  logout(): void {
     localStorage.clear();
   }
 }

@@ -8,7 +8,7 @@ import { EncryptedUser } from '../common/types/types';
 
 @Controller('dashboard')
 export class DashboardController {
-  constructor(private readonly dashboardService: DashboardService) {}
+  constructor(private readonly dashboardService: DashboardService) { }
 
   @ApiOperation({ summary: 'This endpoint is for getting user details' })
   @Get('getUserDetails')

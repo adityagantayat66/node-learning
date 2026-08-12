@@ -3,14 +3,12 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DashboardService {
+  constructor(private _http: HttpClient) {}
 
-  constructor(private _http: HttpClient) { }
-
-  getDashboardData(): Observable<any>
-  {
-    return this._http.get('http://localhost:5000/api/getDashboardData');
+  getDashboardData(): Observable<any> {
+    return this._http.get('http://localhost:8080/api/dashboard/getUserDetails');
   }
 }
