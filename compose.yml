@@ -1,0 +1,59 @@
+services:
+  frontend:
+    profiles: [ "build" ]
+    build:
+      context: ./frontend/node-app
+    volumes:
+      - ./shared-build-version/new-build:/app/dist/node-app/browser
+  postgres:
+    image: postgres:18-alpine
+    container_name: postgrescont
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=nestapp
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    networks:
+      - mynet
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d nestapp" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  nestapi:
+    build:
+      context: ./nest-server
+      dockerfile: dockerfile
+    container_name: nestapi
+    env_file:
+      - ./nest-server/.env-prod
+    networks:
+      - mynet
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/dockerfile
+    container_name: nginxcont
+    networks:
+      - mynet
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./shared-build-version/latest-version:/usr/share/nginx/html
+    depends_on:
+      - nestapi
+
+networks:
+  mynet:
+    driver: bridge
+volumes:
+  postgres_data:

@@ -37,7 +37,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.serverData = this.currentRole
           ? res['data'].data
           : res['data'].data[0];
-      });
+      })
   }
 
   ngOnDestroy(): void {

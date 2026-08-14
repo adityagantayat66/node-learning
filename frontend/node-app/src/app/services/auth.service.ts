@@ -10,13 +10,13 @@ export class AuthService {
 
   register(regFormData: FormData): Observable<any> {
     return this._http.post(
-      'http://localhost:3000/api/auth/signup',
+      'http://localhost:8080/api/auth/signup',
       regFormData,
     );
   }
   login(loginFormData: FormData): Observable<any> {
     return this._http.post(
-      'http://localhost:3000/api/auth/signin',
+      'http://localhost:8080/api/auth/signin',
       loginFormData,
     );
   }
@@ -25,6 +25,7 @@ export class AuthService {
     localStorage.setItem('role', data.role === 'user' ? '0' : '1');
   }
   logout(): void {
-    localStorage.clear();
+    localStorage.removeItem('access_id');
+    localStorage.removeItem('role');
   }
 }

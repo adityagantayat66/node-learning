@@ -44,7 +44,7 @@ export class AuthGuard implements CanActivate {
       return requiredRoles.some((role) => payload.role === role);
     } catch (error) {
       throw new UnauthorizedException(
-        error instanceof Error ? error.message : 'Unauthorized',
+        error instanceof Error ? error.message === 'jwt malformed' ? 'Token Expired. Login again' : error.message : 'Unauthorized',
       );
     }
   }
