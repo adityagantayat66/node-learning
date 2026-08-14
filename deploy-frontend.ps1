@@ -6,7 +6,7 @@ Remove-Item "./shared-build-version/new-build/*" -Recurse -Force -ErrorAction Si
 
 # Build frontend
 Write-Host "Building frontend..."
-docker compose --profile build run --rm frontend
+docker compose --profile build run --build --rm frontend
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Frontend build failed. Deployment aborted." -ForegroundColor Red
