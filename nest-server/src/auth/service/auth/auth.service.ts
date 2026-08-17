@@ -40,7 +40,7 @@ export class AuthService {
     else {
       const fetchedUserDetails = await this.usersService.get(payload.email);
       if (!fetchedUserDetails) {
-        throw new UnauthorizedException('Invalid Credentials');
+        throw new UnauthorizedException('No User found');
       }
       else {
         const hash = fetchedUserDetails?.password || '';

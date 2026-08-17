@@ -1,81 +1,96 @@
 <div>
   @if (currentRole === 0) {
-    <div class="welcome-bar">
-      <div class="welcome-title">
-        Welcome,
-        <span class="username">{{ serverData.fullName }} </span>
-      </div>
-      <button
-        mat-raised-button
-        class="logout-btn primary"
-        (click)="handleLogout()"
-      >
-        Logout
-      </button>
+  <div class="welcome-bar">
+    <div class="welcome-title">
+      Welcome,
+      <span class="username">{{ serverData.fullName }} </span>
     </div>
-    <div class="container">
-      <div class="user-card">
-        <div class="detail">
-          <span class="title">Email</span>
-          <span class="value">{{ serverData.email }}</span>
-        </div>
-        <div class="detail">
-          <span class="title">Full Name</span>
-          <span class="value">{{ serverData.fullName }}</span>
-        </div>
-        <div class="detail">
-          <span class="title">Age</span>
-          <span class="value">{{ serverData.age }}</span>
-        </div>
-        <div class="detail">
-          <span class="title">Your Role</span>
-          <span class="value">Majdoor</span>
-        </div>
+    <button mat-raised-button class="logout-btn primary" (click)="handleLogout()">
+      Logout
+    </button>
+  </div>
+  <div class="container">
+    <div class="user-card">
+      <div class="detail">
+        <span class="title">Email</span>
+        <span class="value">{{ serverData.email }}</span>
+      </div>
+      <div class="detail">
+        <span class="title">Full Name</span>
+        <span class="value">{{ serverData.fullName }}</span>
+      </div>
+      <div class="detail">
+        <span class="title">Age</span>
+        <span class="value">{{ serverData.age }}</span>
+      </div>
+      <div class="detail">
+        <span class="title">Your Role</span>
+        <span class="value">Majdoor</span>
       </div>
     </div>
+  </div>
   } @else {
-    <div class="welcome-bar">
-      <div class="welcome-title">Hello Admin</div>
-      <button
-        mat-raised-button
-        class="logout-btn primary"
-        (click)="handleLogout()"
-      >
-        Logout
-      </button>
-    </div>
-    @if (serverData.length) {
-      <table
-        mat-table
-        [dataSource]="serverData"
-        class="mat-elevation-z8 table-data"
-      >
-        <!--- Note that these columns can be defined in any order.
+  <div class="welcome-bar">
+    <div class="welcome-title">Hello Admin</div>
+    <button mat-raised-button class="logout-btn primary" (click)="handleLogout()">
+      Logout
+    </button>
+  </div>
+  @if (serverData.length) {
+  <table mat-table [dataSource]="serverData" class="mat-elevation-z8 table-data">
+    <!--- Note that these columns can be defined in any order.
               The actual rendered columns are set as a property on the row definition" -->
 
-        <!-- Position Column -->
-        <ng-container matColumnDef="fullName">
-          <th mat-header-cell *matHeaderCellDef>Full Name.</th>
-          <td mat-cell *matCellDef="let element">{{ element.fullName }}</td>
-        </ng-container>
+    <!-- Full Name Column -->
+    <ng-container matColumnDef="fullName">
+      <th mat-header-cell *matHeaderCellDef>Full Name.</th>
+      <td mat-cell *matCellDef="let element">{{ element.fullName }}</td>
+    </ng-container>
 
-        <!-- Name Column -->
-        <ng-container matColumnDef="email">
-          <th mat-header-cell *matHeaderCellDef>Email</th>
-          <td mat-cell *matCellDef="let element">{{ element.email }}</td>
-        </ng-container>
+    <!-- Email Column -->
+    <ng-container matColumnDef="email">
+      <th mat-header-cell *matHeaderCellDef>Email</th>
+      <td mat-cell *matCellDef="let element">{{ element.email }}</td>
+    </ng-container>
 
-        <!-- Weight Column -->
-        <ng-container matColumnDef="age">
-          <th mat-header-cell *matHeaderCellDef>Age</th>
-          <td mat-cell *matCellDef="let element">{{ element.age }}</td>
-        </ng-container>
+    <!-- Age Column -->
+    <ng-container matColumnDef="age">
+      <th mat-header-cell *matHeaderCellDef>Age</th>
+      <td mat-cell *matCellDef="let element">{{ element.age }}</td>
+    </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-      </table>
-    } @else {
-      <div class="zero-user">No users found.</div>
-    }
+    <!-- current role Column -->
+    <ng-container matColumnDef="current_role">
+      <th mat-header-cell *matHeaderCellDef>Current Role</th>
+      <td mat-cell *matCellDef="let element">{{ element.role }}</td>
+    </ng-container>
+
+    <!-- upgrade role Column -->
+    <ng-container matColumnDef="upgrade_role">
+      <th mat-header-cell *matHeaderCellDef>Upgrade Role</th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-raised-button class="logout-btn primary update"
+          (click)="handleUpdateRole(element._id, element.role === 'user' ? 1 : 0)">
+          {{ element.role === 'user' ? "++Admin" : "--User" }}
+        </button>
+      </td>
+    </ng-container>
+
+    <!-- delete Column -->
+    <ng-container matColumnDef="delete">
+      <th mat-header-cell *matHeaderCellDef>Delete</th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-raised-button class="logout-btn primary delete" (click)="handleDelete(element._id)">
+          Delete
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+  } @else {
+  <div class="zero-user">No users found.</div>
+  }
   }
 </div>

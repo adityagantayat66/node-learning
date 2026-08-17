@@ -17,6 +17,15 @@
 
 .logout-btn {
   margin-right: 2rem;
+
+  &.update {
+    background-color: rgb(130, 237, 166) !important;
+  }
+
+  &.delete {
+    background-color: red !important;
+    color: white !important;
+  }
 }
 
 .username {

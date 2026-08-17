@@ -13,6 +13,7 @@ export class DashboardService {
       email: user.email,
       fullName: user.fullName,
       age: user.age,
+      role: user.role
     }));
   }
 
