@@ -9,14 +9,14 @@ export class DashboardService {
   constructor(private _http: HttpClient) { }
 
   getDashboardData(): Observable<any> {
-    return this._http.get('http://localhost:3000/api/dashboard/getUserDetails');
+    return this._http.get('http://localhost:8080/api/dashboard/getUserDetails');
   }
 
   updateRole(id: string, role: number): Observable<any> {
-    return this._http.patch('http://localhost:3000/api/dashboard/updateRole', { id, role });
+    return this._http.patch('http://localhost:8080/api/dashboard/updateRole', { id, role });
   }
 
   deleteUser(id: string): Observable<any> {
-    return this._http.delete(`http://localhost:3000/api/dashboard/delete/${id}`);
+    return this._http.delete(`http://localhost:8080/api/dashboard/delete/${id}`);
   }
 }

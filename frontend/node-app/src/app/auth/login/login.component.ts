@@ -13,7 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { take } from 'rxjs';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../auth.service';
 import { Router, RouterLink } from '@angular/router';
 
 @Component({
@@ -46,7 +46,7 @@ export class LoginComponent {
   constructor(
     private _authService: AuthService,
     private _router: Router,
-  ) {}
+  ) { }
   submitForm(): void {
     const loginFormData = new FormData();
     if (this.loginForm.valid) {
@@ -66,5 +66,5 @@ export class LoginComponent {
         }
       });
   }
-  removeServerError(): void {}
+  removeServerError(): void { }
 }

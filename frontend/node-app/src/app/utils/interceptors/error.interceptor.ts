@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { catchError, throwError } from 'rxjs';
 import { ErrorDialogComponent } from '../../shared/error-dialog/error-dialog.component';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../auth/auth.service';
 
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {

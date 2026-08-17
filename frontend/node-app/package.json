@@ -6,6 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "deploy": "cd ../.. && powershell -ExecutionPolicy Bypass -File ./deploy-frontend.ps1",
+    "rollback": "cd ../.. && powershell -ExecutionPolicy Bypass -File ./rollback-frontend.ps1",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

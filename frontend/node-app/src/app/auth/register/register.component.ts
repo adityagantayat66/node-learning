@@ -10,7 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../auth.service';
 import { take } from 'rxjs';
 import { Router, RouterLink } from '@angular/router';
 
