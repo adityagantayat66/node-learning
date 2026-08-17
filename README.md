@@ -16,23 +16,27 @@ graph TD
         Nginx -->|/api/* requests| Nest[NestJS API Server :3000]
         Nest -->|Database Queries| Postgres[(PostgreSQL DB :5432)]
         Nginx -->|Static Frontend Assets| SharedVol[Volume: ./shared-build-version/latest-version]
-    
     end
 
-    subgraph Build & Versioning Pipeline (npm run deploy)
+    subgraph Deployment Pipeline (npm run deploy)
         DeployScript[deploy-frontend.ps1] -->|1. Build Angular Container| NewBuild[./shared-build-version/new-build]
-        DeployScript -->|2. Backup Previous Version| LastStable[./shared-build-version/last-stable-version]
+        DeployScript -->|2. Backup Current Version| LastStable[./shared-build-version/last-stable-version]
         DeployScript -->|3. Promote Build| SharedVol
+    end
+
+    subgraph Rollback Pipeline (npm run rollback)
+        RollbackScript[rollback-frontend.ps1] -->|Restore Backup| LastStable
+        LastStable -->|Overwrite Active Build| SharedVol
     end
 ```
 
 ### Key Components
 
-1. **Frontend (`/frontend/node-app`)**: Single Page Application built with Angular 18 and Angular Material.
+1. **Frontend (`/frontend/node-app`)**: Single Page Application built with Angular 18 and Angular Material, organized modularly with `auth` and `dashboard` feature modules.
 2. **Backend (`/nest-server`)**: Modular REST API built with NestJS, TypeORM, and JWT Authentication.
 3. **Database (`postgres`)**: PostgreSQL database instance for persistent user and application state.
 4. **Reverse Proxy (`/nginx`)**: Nginx reverse proxy serving compiled Angular static assets from a shared host volume and forwarding `/api` traffic to the NestJS backend container (`http://nestapi:3000`).
-5. **Shared Build Directory (`/shared-build-version`)**: Contains versioned builds (`new-build`, `latest-version`, `last-stable-version`) enabling instant blue/green-style deployments and seamless rollbacks without rebuilding images.
+5. **Shared Build Directory (`/shared-build-version`)**: Contains versioned builds (`new-build`, `latest-version`, `last-stable-version`) enabling instant blue/green-style deployments and seamless scriptable rollbacks without rebuilding images.
 
 ---
 
@@ -42,6 +46,7 @@ graph TD
 node-app/
 ├── compose.yml                  # Main Docker Compose configuration (3 runtime services + 1 build profile)
 ├── deploy-frontend.ps1          # PowerShell deployment script managing build promotion & backups
+├── rollback-frontend.ps1        # PowerShell rollback script restoring previous stable release
 ├── README.md                    # Project documentation
 ├── shared-build-version/        # Shared host volume mounted to Nginx container
 │   ├── latest-version/          # Currently live production build mounted to /usr/share/nginx/html
@@ -59,8 +64,15 @@ node-app/
 │   └── dockerfile
 └── frontend/
     └── node-app/                # Angular Frontend Application
-        ├── src/app/             # Components (Login, SignUp, Dashboard, Guards, Services)
-        └── package.json         # Contains `npm run deploy` task
+        ├── src/app/
+        │   ├── auth/            # Auth module (Login & Register components, Auth service)
+        │   │   ├── login/
+        │   │   ├── register/
+        │   │   └── auth.service.ts
+        │   ├── dashboard/       # Dashboard module (Component & Service)
+        │   ├── shared/          # Shared components & UI modules
+        │   └── utils/           # Route resolvers & guards
+        └── package.json         # Scripts: `npm run deploy` & `npm run rollback`
 ```
 
 ---
@@ -84,7 +96,7 @@ node-app/
    ```
 
 2. **Build and Deploy the Angular Frontend**:
-   Run the initial deployment command to populate `./shared-build-version/latest-version`:
+   Run the deployment command to compile and populate `./shared-build-version/latest-version`:
    ```powershell
    # Option A: From root directory
    powershell -ExecutionPolicy Bypass -File ./deploy-frontend.ps1
@@ -115,7 +127,7 @@ node-app/
 
 ### 🚀 Deploying New Frontend Versions (`npm run deploy`)
 
-Whenever you make frontend code changes in `frontend/node-app/`, deploy them to production by executing:
+Whenever you make frontend code changes in `frontend/node-app/`, deploy them to production by running:
 
 ```bash
 cd frontend/node-app
@@ -124,38 +136,45 @@ npm run deploy
 
 #### What happens during deployment (`deploy-frontend.ps1`):
 1. **Clean Workspace**: Wipes `./shared-build-version/new-build/`.
-2. **Containerized Build**: Executes `docker compose --profile build run --build --rm frontend` to build production Angular assets into `./shared-build-version/new-build/`.
+2. **Containerized Build**: Executes `docker compose --profile build run --build --rm frontend` to compile Angular assets into `./shared-build-version/new-build/`.
 3. **Automated Backup**: Copies current active build from `latest-version/` into `last-stable-version/`.
-4. **Live Promotion**: Promotes files from `new-build/` into `latest-version/`.
+4. **Live Promotion**: Promotes compiled files from `new-build/` into `latest-version/`.
 5. **Zero Downtime**: Nginx automatically serves the updated static assets immediately without restarting containers!
 
 ---
 
-### ⏪ Simple & Instant Rollback Strategy
+### ⏪ Automated Instant Rollback (`npm run rollback`)
 
-If a newly deployed version introduces issues or bugs, you can roll back instantly using either of two methods:
+If a newly deployed version introduces bugs or unexpected issues, perform an instant rollback to the previous stable build using the automated rollback command:
 
-#### Method 1: Host Directory Swap (Instant Zero-Downtime Rollback)
-Copy the backed-up files from `last-stable-version/` back into `latest-version/`:
-
-```powershell
-Remove-Item "./shared-build-version/latest-version/*" -Recurse -Force
-Copy-Item "./shared-build-version/last-stable-version/*" "./shared-build-version/latest-version/" -Recurse -Force
+```bash
+# Executed from frontend directory
+cd frontend/node-app
+npm run rollback
 ```
 
-#### Method 2: Volume Mapping Change in `compose.yml`
-Update the `nginx` service volume mapping in `compose.yml`:
+*(Or from root directory: `powershell -ExecutionPolicy Bypass -File ./rollback-frontend.ps1`)*
+
+#### What happens during rollback (`rollback-frontend.ps1`):
+1. **Verification**: Validates that `./shared-build-version/last-stable-version` exists.
+2. **Clean Active Build**: Clears `./shared-build-version/latest-version/`.
+3. **Restore Backup**: Copies files from `./shared-build-version/last-stable-version/` into `./shared-build-version/latest-version/`.
+4. **Instant Effect**: Nginx immediately serves the restored stable version with zero container downtime!
+
+---
+
+### 🔀 Alternative Manual Rollback via Volume Mapping
+If required, you can also roll back manually by modifying the `nginx` volume mapping in `compose.yml`:
 
 ```yaml
-# Before (Latest Version):
+# Change from:
 volumes:
   - ./shared-build-version/latest-version:/usr/share/nginx/html
 
-# After (Rollback to Previous Stable Version):
+# To:
 volumes:
   - ./shared-build-version/last-stable-version:/usr/share/nginx/html
 ```
-
 Then reload Nginx:
 ```bash
 docker compose up -d nginx
@@ -190,9 +209,9 @@ docker compose up -d nginx
 - **User Deletion**:
   - Click the **Delete** button next to any user record to remove them from the system database.
 
-### 5. Reverse Proxy Verification (`/api`)
-Nginx forwards API traffic seamlessly:
-- Accessing `http://localhost:8080/api/dashboard/getUserDetails` routes through Nginx to NestJS backend (`http://nestapi:3000/api/dashboard/getUserDetails`).
+### 5. Nginx Reverse Proxy Routing (`/api`)
+All frontend HTTP services target the Nginx reverse proxy endpoint (`http://localhost:8080/api/...`):
+- Nginx routes `/api/*` traffic directly to the NestJS backend container (`nestapi:3000`).
 
 ---
 
@@ -226,4 +245,4 @@ If you wish to run the backend and frontend locally for development:
    npm install
    npm start
    ```
-   The frontend will run at `http://localhost:4200` connected to `http://localhost:3000`.
+   The frontend dev server will run at `http://localhost:4200`.
