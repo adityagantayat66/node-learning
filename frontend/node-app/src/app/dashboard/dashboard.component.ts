@@ -23,12 +23,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private _activatedRoute: ActivatedRoute,
     private _router: Router,
     private _authService: AuthService,
-    private _dashboardService: DashboardService
+    private _dashboardService: DashboardService,
   ) {
     this.endSubscription = new Subject<void>();
     this.serverData = {};
     this.currentRole = Number(localStorage.getItem('role'));
-    this.displayedColumns = ['fullName', 'email', 'age', 'current_role', 'upgrade_role', 'delete'];
+    this.displayedColumns = [
+      'fullName',
+      'email',
+      'age',
+      'current_role',
+      'upgrade_role',
+      'delete',
+    ];
   }
 
   ngOnInit(): void {
@@ -38,7 +45,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.serverData = this.currentRole
           ? res['data'].data
           : res['data'].data[0];
-      })
+      });
   }
 
   ngOnDestroy(): void {
@@ -48,25 +55,32 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   handleLogout(): void {
     this._authService.logout();
+    alert('You have been logged out successfully.');
     this._router.navigate(['login']);
   }
 
   handleUpdateRole(id: string, role: number): void {
-    this._dashboardService.updateRole(id, role)
+    this._dashboardService
+      .updateRole(id, role)
       .pipe(takeUntil(this.endSubscription))
       .subscribe(() => {
         const found = this.serverData.find((user: any) => user._id === id);
         if (found) {
           found.role = role === 1 ? 'admin' : 'user';
         }
+        alert('User role updated successfully.');
       });
   }
 
   handleDelete(id: string): void {
-    this._dashboardService.deleteUser(id)
+    this._dashboardService
+      .deleteUser(id)
       .pipe(takeUntil(this.endSubscription))
       .subscribe(() => {
-        this.serverData = this.serverData.filter((user: any) => user._id !== id);
+        this.serverData = this.serverData.filter(
+          (user: any) => user._id !== id,
+        );
+        alert('User deleted successfully.');
       });
   }
 }
