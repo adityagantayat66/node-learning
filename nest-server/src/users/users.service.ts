@@ -1,16 +1,16 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
-import { BaseUserDTO, SignUpDTO, UserToSaveDTO } from '../auth/dto/auth.dto';
+import { UserToSaveDTO } from '../auth/dto/auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository, UpdateResult, DeleteResult } from 'typeorm';
+import { Repository, UpdateResult, DeleteResult, Not } from 'typeorm';
 import { Role } from '../common/custom-decorators/roles';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>
-  ) { }
+    private readonly userRepository: Repository<User>,
+  ) {}
 
   async has(email: string): Promise<boolean> {
     const user = await this.userRepository.findOneBy({ email });
@@ -26,8 +26,12 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
-  async findAll(): Promise<User[]> {
-    return await this.userRepository.find();
+  async findAll(userMail: string): Promise<User[]> {
+    return await this.userRepository.find({
+      where: {
+        email: Not(userMail),
+      },
+    });
   }
 
   async updateRole(id: string, role: Role): Promise<UpdateResult> {

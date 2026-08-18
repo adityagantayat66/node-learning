@@ -13,6 +13,8 @@ COPY --from=builder /app/dist ./dist
 EXPOSE 3000
 CMD [ "node", "dist/main.js"]
 
+
+#-- to run individual container. now being done through compose file. 
 #build cmd-  docker build -t nestapi .
 #network- docker network create mynet
 #run cmd- docker run -d --name nestapi --net mynet --env-file .env -p 3000:3000 nestapi   

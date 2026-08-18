@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Patch, Req, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { UserResponseDTO } from '../auth/dto/auth.dto';
@@ -10,9 +19,10 @@ import { DeleteResult, UpdateResult } from 'typeorm';
 
 @Controller('dashboard')
 export class DashboardController {
-  constructor(private readonly dashboardService: DashboardService,
-    private readonly usersService: UsersService
-  ) { }
+  constructor(
+    private readonly dashboardService: DashboardService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @ApiOperation({ summary: 'This endpoint is for getting user details' })
   @Get('getUserDetails')
@@ -22,7 +32,7 @@ export class DashboardController {
     }
     const user: EncryptedUser = req['user'] as EncryptedUser;
     if (user.role === Role.Admin) {
-      return this.dashboardService.getAllUsers();
+      return this.dashboardService.getAllUsers(user.email);
     }
     const singleUser = await this.dashboardService.getUserByEmail(user.email);
     return singleUser ? [singleUser] : [];
@@ -38,8 +48,13 @@ export class DashboardController {
   @Roles(Role.Admin)
   @ApiOperation({ summary: 'This endpoint is for updating user role' })
   @Patch('updateRole')
-  updateRole(@Body() body: { id: string, role: number }): Promise<UpdateResult> {
-    return this.usersService.updateRole(body.id, body.role === 0 ? Role.User : Role.Admin);
+  updateRole(
+    @Body() body: { id: string; role: number },
+  ): Promise<UpdateResult> {
+    return this.usersService.updateRole(
+      body.id,
+      body.role === 0 ? Role.User : Role.Admin,
+    );
   }
 
   @Roles(Role.Admin)
@@ -49,4 +64,3 @@ export class DashboardController {
     return this.usersService.delete(id);
   }
 }
-

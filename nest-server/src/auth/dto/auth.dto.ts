@@ -6,7 +6,7 @@ import {
   IsNotEmpty,
   Min,
   MinLength,
-  IsString
+  IsString,
 } from 'class-validator';
 import { Role } from '../../common/custom-decorators/roles';
 
@@ -14,61 +14,60 @@ export class SignInDTO {
   @ApiProperty({ example: 'adi@mail.com' })
   @IsEmail()
   @IsNotEmpty()
-  email: string;
+  email!: string;
 
   @ApiProperty()
   @MinLength(6)
-  password: string;
+  password!: string;
 }
 
 export class SignUpDTO {
   @ApiProperty({ example: 'Aditya' })
   @IsNotEmpty()
   @IsString()
-  fullName: string;
+  fullName!: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
-  password: string;
+  password!: string;
 
   @ApiProperty({ example: 25 })
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  age: number;
+  age!: number;
 
   @ApiProperty({ example: 'adi@mail.com' })
   @IsEmail()
   @IsNotEmpty()
-  email: string;
+  email!: string;
 }
 
 export class BaseUserDTO extends SignUpDTO {
   @ApiProperty()
-  _id: string;
+  _id!: string;
 }
 
 export class UserToSaveDTO extends SignUpDTO {
   @ApiProperty()
-  role: Role;
+  role!: Role;
 }
 
 export class UserResponseDTO {
   @ApiProperty()
-  _id: string;
+  _id!: string;
 
   @ApiProperty()
-  email: string;
+  email!: string;
 
   @ApiProperty()
-  fullName: string;
+  fullName!: string;
 
   @ApiProperty()
-  age: number;
+  age!: number;
 
   @ApiProperty({ enum: Role, required: false })
   role?: Role;
 }
-
